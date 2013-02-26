@@ -163,6 +163,8 @@ static char* GLOWVIEW_KEY = "GLOWVIEW";
 - (void) removeGlow {
   [[self glowView] removeFromSuperview];
   [self setGlowView:nil];
+  [self.glowView.layer removeAnimationForKey:@"pulse"];
+  [self.glowView.layer removeAnimationForKey:@"fadeout"];
 }
 
 - (void) setGlow {
