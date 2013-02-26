@@ -161,10 +161,9 @@ static char* GLOWVIEW_KEY = "GLOWVIEW";
 // Stop glowing by removing the glowing view from the superview
 // and removing the association between it and this object.
 - (void) removeGlow {
+  [self.glowView.layer removeAllAnimations];
   [[self glowView] removeFromSuperview];
   [self setGlowView:nil];
-  [self.glowView.layer removeAnimationForKey:@"pulse"];
-  [self.glowView.layer removeAnimationForKey:@"fadeout"];
 }
 
 - (void) setGlow {
