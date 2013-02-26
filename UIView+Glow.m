@@ -78,33 +78,39 @@ static char* GLOWVIEW_KEY = "GLOWVIEW";
 }
 
 - (void)startGlowingWithColor:(UIColor *)color intensity:(CGFloat)intensity duration:(float)duration {
-  [self startGlowingWithColor:color intensity:intensity duration:duration repeat:YES];
+  [self startGlowingWithColor:color intensity:intensity duration:duration repeat:0];
 }
 
-- (void)startGlowingWithColor:(UIColor *)color intensity:(CGFloat)intensity duration:(float)duration repeat:(BOOL)repeat {
-  [self startGlowingWithColor:color fromIntensity:0.1 toIntensity:intensity duration:duration repeat:repeat];
+- (void)startGlowingWithColor:(UIColor *)color intensity:(CGFloat)intensity duration:(float)duration repeat:(NSInteger)repeat {
+  [self startGlowingWithColor:color fromIntensity:0 toIntensity:intensity duration:duration repeat:repeat];
 }
 
-- (void) startGlowingWithColor:(UIColor*)color fromIntensity:(CGFloat)fromIntensity toIntensity:(CGFloat)toIntensity duration:(float)duration repeat:(BOOL)repeat {
-    // If we're already glowing, don't bother
-    if ([self glowView])
-        return;
+- (void) startGlowingWithColor:(UIColor*)color fromIntensity:(CGFloat)fromIntensity toIntensity:(CGFloat)toIntensity duration:(float)duration repeat:(NSInteger)repeat {
+  // If we're already glowing, don't bother
+  if ([self glowView])
+      return;
 
-    UIView *glowView = [self createGlowView:color];
+  if (repeat < 0) {
+    repeat = HUGE_VALF;
+  }
+  UIView *glowView = [self createGlowView:color];
+  glowView.layer.opacity = toIntensity;
   
-    glowView.layer.opacity = toIntensity;
-    
-    // Create an animation that slowly fades the glow view in and out forever.
-    NSString *timingFuncName = (repeat ? kCAMediaTimingFunctionEaseInEaseOut : kCAMediaTimingFunctionEaseIn);
-    CABasicAnimation* animation = [CABasicAnimation animationWithKeyPath:@"opacity"];
-    animation.fromValue = @(fromIntensity);
-    animation.toValue = @(toIntensity);
-    animation.repeatCount = repeat ? HUGE_VAL : 0;
-    animation.duration = duration;
-    animation.autoreverses = repeat;
-    animation.timingFunction = [CAMediaTimingFunction functionWithName:timingFuncName];
-    
+  // Create an animation that slowly fades the glow view in and out forever.
+  NSString *timingFuncName = (repeat ? kCAMediaTimingFunctionEaseInEaseOut : kCAMediaTimingFunctionEaseIn);
+  CABasicAnimation* animation = [CABasicAnimation animationWithKeyPath:@"opacity"];
+  animation.fromValue = @(fromIntensity);
+  animation.toValue = @(toIntensity);
+  animation.repeatCount = repeat;
+  animation.duration = duration;
+  animation.autoreverses = repeat > 0;
+  animation.timingFunction = [CAMediaTimingFunction functionWithName:timingFuncName];
+  [CATransaction begin]; {
+    [CATransaction setCompletionBlock:^(void){
+      [self removeGlow];
+    }];
     [glowView.layer addAnimation:animation forKey:@"pulse"];
+  } [CATransaction commit];
 }
 
 

@@ -21,8 +21,8 @@
 - (void) startGlowing;
 - (void) startGlowingWithColor:(UIColor*)color intensity:(CGFloat)intensity;
 - (void)startGlowingWithColor:(UIColor *)color intensity:(CGFloat)intensity duration:(float)duration;
-- (void)startGlowingWithColor:(UIColor *)color intensity:(CGFloat)intensity duration:(float)duration repeat:(BOOL)repeat;
-- (void) startGlowingWithColor:(UIColor*)color fromIntensity:(CGFloat)fromIntensity toIntensity:(CGFloat)toIntensity duration:(float)duration repeat:(BOOL)repeat;
+- (void)startGlowingWithColor:(UIColor *)color intensity:(CGFloat)intensity duration:(float)duration repeat:(NSInteger)repeat;
+- (void) startGlowingWithColor:(UIColor*)color fromIntensity:(CGFloat)fromIntensity toIntensity:(CGFloat)toIntensity duration:(float)duration repeat:(NSInteger)repeat;
 
 - (void) removeGlow;
 - (void) setGlow;
