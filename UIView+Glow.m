@@ -94,7 +94,8 @@ static char* GLOWVIEW_KEY = "GLOWVIEW";
     repeat = HUGE_VALF;
   }
   UIView *glowView = [self createGlowView:color];
-  glowView.layer.opacity = toIntensity;
+  BOOL reverse = repeat > 0;
+  glowView.layer.opacity = (reverse ? fromIntensity : toIntensity);
   
   // Create an animation that slowly fades the glow view in and out forever.
   NSString *timingFuncName = (repeat ? kCAMediaTimingFunctionEaseInEaseOut : kCAMediaTimingFunctionEaseIn);
@@ -103,7 +104,7 @@ static char* GLOWVIEW_KEY = "GLOWVIEW";
   animation.toValue = @(toIntensity);
   animation.repeatCount = repeat;
   animation.duration = duration;
-  animation.autoreverses = repeat > 0;
+  animation.autoreverses = reverse;
   animation.timingFunction = [CAMediaTimingFunction functionWithName:timingFuncName];
   [CATransaction begin]; {
     [CATransaction setCompletionBlock:^(void){
@@ -121,10 +122,15 @@ static char* GLOWVIEW_KEY = "GLOWVIEW";
 - (void) stopGlowingWithDuration:(float)duration {
   // Create an animation that slowly fades the glow view out.
   CABasicAnimation* animation = [CABasicAnimation animationWithKeyPath:@"opacity"];
-  animation.fromValue = @([self.glowView.layer.presentationLayer opacity]);
+  if (self.glowView.layer.presentationLayer) {
+    animation.fromValue = @([self.glowView.layer.presentationLayer opacity]);
+  } else {
+    animation.fromValue = @([self.glowView.layer opacity]);
+  }
   animation.toValue = @(0);
   animation.duration = duration;
   animation.timingFunction = [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseOut];
+  self.glowView.layer.opacity = 0;
   [CATransaction begin]; {
     [CATransaction setCompletionBlock:^(void){
       [self removeGlow];
@@ -161,8 +167,8 @@ static char* GLOWVIEW_KEY = "GLOWVIEW";
 // Stop glowing by removing the glowing view from the superview
 // and removing the association between it and this object.
 - (void) removeGlow {
-  [self.glowView.layer removeAllAnimations];
   [[self glowView] removeFromSuperview];
+  [self.glowView.layer removeAllAnimations];
   [self setGlowView:nil];
 }
 
