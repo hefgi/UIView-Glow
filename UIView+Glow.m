@@ -108,7 +108,9 @@ static char* GLOWVIEW_KEY = "GLOWVIEW";
   animation.timingFunction = [CAMediaTimingFunction functionWithName:timingFuncName];
   [CATransaction begin]; {
     [CATransaction setCompletionBlock:^(void){
-      [self removeGlow];
+      if (reverse) {
+        [self removeGlow];
+      }
     }];
     [glowView.layer addAnimation:animation forKey:@"pulse"];
   } [CATransaction commit];
